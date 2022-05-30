@@ -152,7 +152,32 @@
 		</VerticalLayout>
 	</TableLayout>
 	-->
-	<TableLayout active='true' id="MainMenuPanel" height='95%' width='100%' rectAlignment='lowerRight'>
+	<TableLayout active='true' id="ContributorsPanel" height='95%' width='100%' rectAlignment='lowerRight'>
+		<row preferredHeight='40'>
+			<button id="Contributors" onClick="Global/ToggleContributors" width="100%" height="100%" fontSize="30" rectAlignment="UpperCenter">Hide Project Contributors</button>
+		</row>
+		<row>
+			<text fontSize='30'>Uno Scripted Project Contributors </text>
+		</row>
+		<row>
+			<VerticalLayout>
+
+				<text fontSize='30' color="Black">Steam Contributors </text>
+					<text fontSize='25' alignment="MiddleLeft">Dejman</text>
+					<text fontSize='30' color="Black">Github Contributors </text>
+					<text fontSize='25' alignment="MiddleLeft">tasermonkey</text>
+					<text fontSize='25' alignment="MiddleLeft">Eegex</text>
+					<text fontSize='25' alignment="MiddleLeft">propstg</text>
+					<text fontSize='25' alignment="MiddleLeft">AppeazeTheCheese</text>
+					<text fontSize='25' alignment="MiddleLeft">dbrohl</text>
+					<text fontSize='25' alignment="MiddleLeft">tekemperor</text>
+			</VerticalLayout>
+		</row>
+	</TableLayout>
+	<TableLayout active='false' id="MainMenuPanel" height='95%' width='100%' rectAlignment='lowerRight'>
+		<row preferredHeight='40'>
+			<button id="Contributors" onClick="Global/ToggleContributors" width="100%" height="100%" fontSize="30" rectAlignment="UpperCenter">Show Project Contributors</button>
+		</row>
 		<row><!--Menu Title-->
 
 			<image image="UnoTitle" />
