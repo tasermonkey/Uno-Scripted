@@ -233,6 +233,21 @@
 				<toggle isOn="true" onValueChanged="Global/UpdateScriptedUnoRules" scale='2 2 1' />
 			</cell>
 		</row>
+		<row id="RelaxedUnoRow" preferredHeight='80' active='false'><!--Scripted Uno-->
+
+			<cell>
+				<text fontSize='30' tooltipfontSize='25' tooltipBackgroundColor='rgba(0,0,0,1)' tooltipPosition='Left' toolTip='How much time to give the player going uno before others can call it'>Relaxed Uno Calling:</text>
+			</cell>
+			<cell>
+				<Dropdown fontSize='20' itemHeight='30' onValueChanged="Global/UpdateRelaxedUno">
+					<Option>Cut Throat</Option>
+					<Option>1/4 Second</Option>
+					<Option>1/2 Second</Option>
+					<Option>3/4 Second</Option>
+					<option>1 Second</option>
+				</Dropdown>
+			</cell>
+		</row>
 
 		<row preferredHeight='80'>
 
