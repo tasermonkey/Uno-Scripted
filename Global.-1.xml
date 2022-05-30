@@ -82,7 +82,7 @@
 			</button>
 		</cell>
 		<cell visibility="false" id="YellowSwitchCell">
-			<button color="white" fontStyle="Bold" fontSize="24" onClick="Global/SwitchPanel" id="YellowSwitch">
+			<button color="yellow" fontStyle="Bold" fontSize="24" onClick="Global/SwitchPanel" id="YellowSwitch">
 				[Player Name Yellow]
 			</button>
 		</cell>
