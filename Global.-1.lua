@@ -436,7 +436,7 @@ function PlayerTurnLoop()
                 if lastCard.Name == "+2"
                 then
                     temp = "Stack On Another +2"
-                elseif lastCard.Name == "+4"
+                elseif lastCard.Name == "+4" or lastCard.Name == "+4 reverse"
                 then
                     temp = "Stack On Another +4"
                 end
@@ -534,7 +534,7 @@ function CheckPlayedCard(card_played)
     then
         --If the card being played is held by a computer player, we allow it - assuming that the logic controlling computer players is working correctly
 
-        if lastCard.GUID == nil--Assume that this is the first card being played, if lastCard Object is nil
+        if lastCard == nil or lastCard.GUID == nil--Assume that this is the first card being played, if lastCard Object is nil
         then
             return true--The card is allowed to be played
 
@@ -548,10 +548,10 @@ function CheckPlayedCard(card_played)
                         return true -- return true : the card being played is allowed
                     end
 
-                elseif card_played.getName() == "+4" -- check if the card being played is a +4
+                elseif card_played.getName() == "+4" or card_played.getName() == "+4 reverse" -- check if the card being played is a +4
                 then
 
-                    if lastCard.Name == "+4" or HouseRules.Stack_All -- check that the last card played was also a +4, or the ALL stacking rule is enabled
+                    if lastCard.Name == "+4" or card_played.getName() == "+4" or HouseRules.Stack_All -- check that the last card played was also a +4, or the ALL stacking rule is enabled
                     then
                         return true -- return true : the card being played is allowed
                     end
@@ -620,12 +620,6 @@ function PlayCard(card)
         --chand the turn state to decidce : the current player will have to decide what color to call
         PlayerTurnState = TURN_STATE.Decide
         DescisionState = DESCISION_STATE.Wild
-    end
-
-    --If the card played was a reverse, change the direction of play
-    if lastCard.Name == "reverse"
-    then
-      clockwise = not clockwise
     end
 
     if lastCard.Name == "7" and HouseRules.Seven_Zero then
@@ -871,6 +865,26 @@ function ClearPlayerHand(player_to_clear)
         DrawDeckObject.shuffle()
     end
 end
+
+function doPlusFourBehavior()
+  if HouseRules.Stack_Plus4 or HouseRules.Stack_ALL
+  then--If stacking rules apply, the turn state will be 'Respond'
+      PlayerTurnState = TURN_STATE.Respond
+      stacking = true
+  else--otherwise the player's turn will end
+      PlayerTurnState = TURN_STATE.End
+  end
+  --Add 4 to the number of cards to be drawn
+  cardsToDraw = cardsToDraw + 4
+end
+
+function doReverseBehavior()
+  if #CurrentPlayerList == 2
+  then
+      PlayerTurnState = TURN_STATE.End
+  end
+  clockwise = not clockwise
+end
 --[[Handles any game logic that needs to occur at the end of a players turn, and movers the current player to the next player]]
 function EndPlayerTurn()
     if winCondition == false
@@ -879,8 +893,6 @@ function EndPlayerTurn()
         then
             ToggleUnoButton(false)
         end
-        --Determine the next player in turn
-        DetermineNextPlayer()
 
         --reset the state machine to default - 'play'
         PlayerTurnState = TURN_STATE.Play
@@ -900,27 +912,24 @@ function EndPlayerTurn()
             cardsToDraw = cardsToDraw + 2
             elseif lastCard.Name == "+4"
             then
-                if HouseRules.Stack_Plus4 or HouseRules.Stack_ALL
-                then--If stacking rules apply, the turn state will be 'Respond'
-                    PlayerTurnState = TURN_STATE.Respond
-                    stacking = true
-                else--otherwise the player's turn will end
-                    PlayerTurnState = TURN_STATE.End
-                end
-                --Add 4 to the number of cards to be drawn
-                cardsToDraw = cardsToDraw + 4
+                doPlusFourBehavior()
             elseif lastCard.Name == "skip"
             then--check if the last card played was a skip card
                 debug('Last Card skip. Ending next players turn')
                 PlayerTurnState = TURN_STATE.End
             elseif lastCard.Name == "reverse"
             then
-                if #CurrentPlayerList == 2
-                then
-                    PlayerTurnState = TURN_STATE.End
-                end        
+                doReverseBehavior()
+          elseif lastCard.Name == "+4 reverse"
+            then
+                doReverseBehavior()
+                doPlusFourBehavior()
             end
         end
+
+        --Determine the next player in turn
+        --This must be after the above if statement, in order for the +4 reverse to take effect properly
+        DetermineNextPlayer()
 
         cardPlayed = false --reset the cardPlayed variable
         cardDrawn = false   --reset the cardDrawn variable
@@ -1281,10 +1290,11 @@ end
 --[[Called by the "Hide/Show Main Menu" button]]
 function ToggleMenu(a,b, ID)
     --Hides the Main Menu UI and all associated UI elements
-    if UI.getAttribute("MainMenuPanel", "active") == 'true'
+    if UI.getAttribute("MainMenuPanel", "active") == 'true' or UI.getAttribute("ContributorsPanel", "active") == 'true'
     then
         UI.setAttribute("FakePlayerPanel", "active", "false")
         UI.setAttribute("MainMenuPanel", "active", "false")
+        UI.setAttribute("ContributorsPanel", "active", "false")
         UI.setAttribute("MainMenuContainer", "height", "5%")
         UI.setAttribute("HideMenuButton", "height", "100%")
         UI.setAttribute("HideMenuButton", "text", "Show Main Menu")
@@ -1295,6 +1305,21 @@ function ToggleMenu(a,b, ID)
         UI.setAttribute("HideMenuButton", "height", "5%")
         UI.setAttribute("HideMenuButton", "text", "Hide Main Menu")
     end
+end
+function ToggleContributors(a,b,ID)
+   --Hides the Main Menu UI and all associated UI elements
+   if UI.getAttribute("ContributorsPanel", "active") == 'true'
+   then
+       UI.setAttribute("ContributorsPanel", "active", "false")
+
+       UI.setAttribute("FakePlayerPanel", "active", "true")
+       UI.setAttribute("MainMenuPanel", "active", "true")
+   else
+        UI.setAttribute("ContributorsPanel", "active", "true")
+
+        UI.setAttribute("FakePlayerPanel", "active", "false")
+        UI.setAttribute("MainMenuPanel", "active", "false")
+   end
 end
 --[[Called by the 'Pass Turn' UI Button]]
 function PassTurnButton()
