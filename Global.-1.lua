@@ -6,7 +6,7 @@
 --Date Last Updated: 2022-05-30
 
 
-local debug_mode = false
+local debug_mode = true
 --[[ Zone References --]]
 local PlayZoneTrigger   --Scripting Zone Object that defines where the play card pile is
 local DrawZoneTrigger   --Scripting Zone Object that defines where the draw card pile is
@@ -1845,6 +1845,7 @@ function debug(string)
   if debug_mode == true
   then
     log('[DEBUG]  '.. tostring(string))
+    print('[DEBUG]  '.. tostring(string))
   end
 end
 --[[===================END HELPER FUNCITONS======================]]
