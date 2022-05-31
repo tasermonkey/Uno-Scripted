@@ -1,9 +1,9 @@
 --[[ Lua code. See documentation: https://api.tabletopsimulator.com/ --]]
 --TableTop Simulator UNO Scripted
 --Steam Workshop ID : NA
---Last UpdatedB By: ITzMeek
---Date Last Updated: 5-18-2021
---TTS Version Created On: v13.1.1
+--Last UpdatedB By: Tasermonkey
+--https://github.com/tasermonkey/Uno-Scripted
+--Date Last Updated: 2022-05-30
 
 
 local debug_mode = false
