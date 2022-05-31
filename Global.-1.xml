@@ -233,7 +233,7 @@
 				<toggle isOn="true" onValueChanged="Global/UpdateScriptedUnoRules" scale='2 2 1' />
 			</cell>
 		</row>
-		<row id="RelaxedUnoRow" preferredHeight='80' active='false'><!--Scripted Uno-->
+		<row id="RelaxedUnoRow" preferredHeight='80' active='true'><!--Scripted Uno-->
 
 			<cell>
 				<text fontSize='30' tooltipfontSize='25' tooltipBackgroundColor='rgba(0,0,0,1)' tooltipPosition='Left' toolTip='How much time to give the player going uno before others can call it'>Relaxed Uno Calling:</text>
