@@ -136,7 +136,8 @@ local HouseRules = {            --Table of references to the current set of game
     ["Stack_Plus2"] = false,
     ["Stack_All"] = false,
     ["Call_Uno"] = true,
-    ["Seven_Zero"] = false}
+    ["Seven_Zero"] = false,
+    ["Relaxed_Uno_Calling"] = 0.5}
 
 local playerOneIndex = 0        --Index in the currentPlayerList of who player one is
 local currentPlayer = nil       --Tracks who the current player is
@@ -1253,12 +1254,34 @@ function UpdateScriptedUnoRules(a,opt)
     if opt == "True"
     then
         HouseRules.Call_Uno = true
+        UI.setAttribute("RelaxedUnoRow", "active", "true")
     elseif opt == "False"
     then
         HouseRules.Call_Uno = false
+        UI.setAttribute("RelaxedUnoRow", "active", "false")
     end
     debug("Scipted Uno: ".. tostring(HouseRules.Call_Uno) .. "\n")
 end
+
+function UpdateRelaxedUno(a, opt)
+    if opt == "Cut Throat"
+    then
+        HouseRules.Relaxed_Uno_Calling = false
+    elseif opt == "1/4 Second"
+    then
+        HouseRules.Relaxed_Uno_Calling = 0.250
+    elseif opt == "1/2 Second"
+    then
+        HouseRules.Relaxed_Uno_Calling = 0.500
+    elseif opt == "3/4 Second"
+    then
+        HouseRules.Relaxed_Uno_Calling = 0.750
+    elseif opt == "1 Second"
+    then
+        HouseRules.Relaxed_Uno_Calling = 1.000
+    end
+end
+
 --[[Called by the Main Menu toggle to change 7-0 rules]]
 function UpdateSevenZeroRules(a,opt)
     --//TODO: 7-0 menu option is currently disabled because it has not been implemented into this version of the script
@@ -1337,11 +1360,22 @@ function ToggleUnoButton(Toggle)
     then
         math.randomseed(os.time())
         UI.setAttribute('UNOButton', 'active', 'true')
+        if HouseRules.Relaxed_Uno_Calling != false
+        then
+            -- testing still, allow the playing going uno a little bit of a head start since
+            -- some people may not be quick enough on the mouse
+            DrawZoneMattObject.UI.setAttribute("UNOButton", "visibility", unoPlayer.color)
+        end
         --Slightly randomize the position of the call UNO button every time it is shown
         UI.setAttribute('UNOButton', 'offsetXY', ''..math.random(-500,500)..' 250')
         --Modify the color to match the player that has UNO
         UI.setAttribute('UNOButton', 'color', unoPlayer.color)
-
+        if HouseRules.Relaxed_Uno_Calling != false
+        then
+            Wait.time(function()
+                DrawZoneMattObject.UI.setAttribute("UNOButton", "visibility", "")
+            end, HouseRules.Relaxed_Uno_Calling);
+        end
     else
         UI.setAttribute('UNOButton', 'active', 'false')
     end
