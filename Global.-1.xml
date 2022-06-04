@@ -245,6 +245,7 @@
 					<Option>1/2 Second</Option>
 					<Option>3/4 Second</Option>
 					<option>1 Second</option>
+					<option>3 Seconds</option>
 				</Dropdown>
 			</cell>
 		</row>

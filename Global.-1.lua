@@ -495,7 +495,11 @@ function PlayerTurnLoop()
         if not stacking --If the current player is NOT stacking on another draw card / normal flow of play
         then
             --Deal total number of cards to the player
-            GiveCardsToPlayer(cardsToDraw,currentPlayer)
+            if cardsToDraw > 0
+            then
+                broadcastToAll(("%s has drawn %d cards!"):format(currentPlayer.steam_name, cardsToDraw), currentPlayer.color)
+                GiveCardsToPlayer(cardsToDraw,currentPlayer)
+            end
 
             --During normal flow of play, when the stacking rule is not enabled - stacking will always be false, but the amount of cards to draw will be 0 unless from a Draw Card being played
         else
@@ -1279,6 +1283,9 @@ function UpdateRelaxedUno(a, opt)
     elseif opt == "1 Second"
     then
         HouseRules.Relaxed_Uno_Calling = 1.000
+    elseif opt == "3 Seconds"
+    then
+        HouseRules.Relaxed_Uno_Calling = 3.000
     end
 end
 
@@ -1378,6 +1385,7 @@ function ToggleUnoButton(Toggle)
         end
     else
         UI.setAttribute('UNOButton', 'active', 'false')
+        DrawZoneMattObject.UI.setAttribute("UNOButton", "visibility", "")
     end
 end
 --[[Called by the 'Call UNO' button]]
