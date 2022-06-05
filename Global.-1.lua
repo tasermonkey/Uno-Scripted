@@ -6,7 +6,9 @@
 --Date Last Updated: 2022-05-30
 
 
-local debug_mode = true
+local debug_mode = false
+local keep_deck_interactable = true
+
 --[[ Zone References --]]
 local PlayZoneTrigger   --Scripting Zone Object that defines where the play card pile is
 local DrawZoneTrigger   --Scripting Zone Object that defines where the draw card pile is
@@ -185,7 +187,6 @@ end
 
 function onPlayerDisconnect(player_id)
     --collect cards from the disconnected player's hand and return them to the deck
-    debug(player_id)
     UpdateCurrentPlayers()
     ClearPlayerHand(player_id)
 end
@@ -316,6 +317,10 @@ function GameStart()
     --enable the draw draw card buttons
     DrawZoneMattObject.UI.show("DrawButton1")
     DrawZoneMattObject.UI.show("DrawButton2")
+    Turns.enable = true
+    Turns.type = 2
+    Turns.pass_turns = false
+
     --Hide the main menu
     UI.setAttribute("MainMenuContainer", "active", "false")
     --Mark any computer players that are turned on
@@ -331,16 +336,21 @@ function GameStart()
     currentPlayer = CurrentPlayerList[playerOneIndex]
     --Set our PlayerTurnState to 'Play'
     PlayerTurnState = TURN_STATE.Play
+    local colors = {}
+    for i=1, #CurrentPlayerList do
+        colors[i] = CurrentPlayerList[i].color
+    end
+    Turns.order = colors
+    Turns.turn_color = currentPlayer.color
     --Shuffle the draw deck pile
     DrawDeckObject.shuffle()
     --Enter the game's state machine loop
     PlayerTurnLoop()
 
 end
+
 --This function gives me nightmares
-function Reset_Game()
-    debug("Game Ending!")
-    broadcastToAll(("%s has won this round!"):format(currentPlayer.steam_name), getColorValueFromPlayer(currentPlayer.color))
+function ResetGameCommon()
     --First we hide and reset any UI elements that are used during gameplay
     UI.hide("StackingCardPanel")
     UI.hide("WildCardPanel")
@@ -393,7 +403,20 @@ function Reset_Game()
         4)
     --Reset the color tint of our Play Mat and Rotation Mat
     PlayZoneMattObject.setColorTint({1,1,1})
+end
+
+function ResetGameButton(obj, player_color)
+    debug("Reset Game Button pressed")
+    broadcastToAll("Host has resetted the game!", getColorValueFromPlayer(player_color))
+    ResetGameCommon()
+end
+
+function Reset_Game()
+    debug("Game Ending!")
+    broadcastToAll(("%s has won this round!"):format(currentPlayer.steam_name), getColorValueFromPlayer(currentPlayer.color))
+    ResetGameCommon()
 end--Function Reset_Game END
+
 --[[Main gameplay loop / state machine. Controls the flow of logic based on conditions of the game]]
 function PlayerTurnLoop()
     debug('Enter Turn Loop: '..PlayerTurnState)
@@ -973,6 +996,7 @@ function DetermineNextPlayer()
     --set the currentPlayer to the new currentPlayerIndex
     currentPlayer = CurrentPlayerList[currentPlayerIndex]
     debug('Current Player is now ' .. currentPlayer.color)
+    Turns.turn_color = currentPlayer.color
 end
 --[[Grab players that are currently seated and populate 'CurrentPlayerList']]
 function UpdateCurrentPlayers()
@@ -1088,14 +1112,14 @@ function UpdateDeckObjects()
     --reset DrawDeck & PlayDeck objects to not be interactable
     if DrawDeckObject
     then
-        if not debug_mode
+        if not keep_deck_interactable
         then
             DrawDeckObject.interactable = false
         end
     end
     if PlayDeckObject
     then
-        if not debug_mode
+        if not keep_deck_interactable
         then
             PlayDeckObject.interactable = false
         end
@@ -1283,6 +1307,12 @@ function UpdateRelaxedUno(a, opt)
     elseif opt == "1 Second"
     then
         HouseRules.Relaxed_Uno_Calling = 1.000
+    elseif opt == "1.5 Seconds"
+        then
+            HouseRules.Relaxed_Uno_Calling = 1.500
+    elseif opt == "2 Seconds"
+    then
+            HouseRules.Relaxed_Uno_Calling = 2.000
     elseif opt == "3 Seconds"
     then
         HouseRules.Relaxed_Uno_Calling = 3.000
@@ -1366,21 +1396,22 @@ function ToggleUnoButton(Toggle)
     if Toggle
     then
         math.randomseed(os.time())
-        UI.setAttribute('UNOButton', 'active', 'true')
         if HouseRules.Relaxed_Uno_Calling != false
         then
             -- testing still, allow the playing going uno a little bit of a head start since
             -- some people may not be quick enough on the mouse
-            DrawZoneMattObject.UI.setAttribute("UNOButton", "visibility", unoPlayer.color)
+            debug('Setting visibility to '..unoPlayer.color)
         end
         --Slightly randomize the position of the call UNO button every time it is shown
         UI.setAttribute('UNOButton', 'offsetXY', ''..math.random(-500,500)..' 250')
         --Modify the color to match the player that has UNO
         UI.setAttribute('UNOButton', 'color', unoPlayer.color)
+        UI.setAttribute('UNOButton', 'active', 'true')
+        UI.setAttribute("UNOButton", "visibility", unoPlayer.color)
         if HouseRules.Relaxed_Uno_Calling != false
         then
             Wait.time(function()
-                DrawZoneMattObject.UI.setAttribute("UNOButton", "visibility", "")
+                UI.setAttribute("UNOButton", "visibility", "")
             end, HouseRules.Relaxed_Uno_Calling);
         end
     else
